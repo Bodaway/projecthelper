@@ -5,7 +5,7 @@ using projecthelper.EfCore;
 using projecthelper.Result;
 using System.Linq.Expressions;
 
-namespace postalCrisisV2.Repositories;
+namespace projecthelper.EfCore;
 
 
 public class Repository<TEntity> : IGenericRepository<TEntity> where TEntity : class, IBaseEntity
@@ -99,6 +99,15 @@ public class Repository<TEntity> : IGenericRepository<TEntity> where TEntity : c
         {
             return Result<TEntity>.setFail(ex, _logger);
         }
+    }
+
+    public async Task<Result<TEntity>> Update(Guid id, Action<TEntity> update)
+    {
+        return (await (await Get(id)).AsyncMap(async (existing) =>
+        {
+            update(existing);
+            return await Update(existing);
+        }, _logger));
     }
 
     public async Task<Result<TEntity>> Get(Guid id)

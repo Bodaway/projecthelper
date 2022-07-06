@@ -1,9 +1,9 @@
-﻿using Microsoft.Bot.Builder;
+﻿using ccas_mgmt_core.Bot;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using postalCrisisV2.Bot;
 
 namespace projecthelper.Bot; 
 
@@ -12,7 +12,6 @@ public class ConversationService : IConversationService
     private readonly IBotFrameworkHttpAdapter _adapter;
     private readonly IConversationReferencesStore _conversationReferences;
     private readonly string _appId;
-    private readonly ConversationState _conversationState;
     private readonly IServiceProvider _serviceProvider;
     private readonly FlowOrchestrator _orchestrator;
 
@@ -22,7 +21,6 @@ public class ConversationService : IConversationService
         IConversationReferencesStore conversationReferences)
     {
         _adapter = adapter;
-        _conversationState = conversationState;
         _conversationReferences = conversationReferences;
         _appId = configuration["MicrosoftAppId"] ?? string.Empty;
         _serviceProvider = serviceProvider;
@@ -31,6 +29,9 @@ public class ConversationService : IConversationService
 
     public async Task StartConversation<Data>(string channelId, FlowStepResult<Data> data, CancellationToken cancellationToken = default) where Data : FlowData
     {
+        if (string.IsNullOrEmpty(channelId))
+            throw new Exception("Can't start conversation because channel ID is null");
+        
         ConversationReference? conversation = await _conversationReferences.GetConversation(channelId);
         if (conversation == null)
         {

@@ -12,5 +12,6 @@ public interface IGenericRepository<TEntity> where TEntity : IBaseEntity
     Task<Result<TEntity>> InsertIfNotExist(TEntity dashboard);
     Task<Result<TEntity>> Insert(TEntity dashboard);
     Task<Result<TEntity>> Update(TEntity dashboard);
+    Task<Result<TEntity>> Update(Guid id, Action<TEntity> update);
     Task<Result<IEnumerable<TEntity>>> GetAllByComparer(Expression<Func<TEntity, bool>> predicate);
 }
