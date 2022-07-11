@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
-using projecthelper.EfCore;
+using postalCrisisV2.Core;
 using projecthelper.Result;
 using System.Linq.Expressions;
 
@@ -160,5 +160,20 @@ public class Repository<TEntity> : IGenericRepository<TEntity> where TEntity : c
         var entity = Get(id);
         _ctx.Remove(entity);
         await _ctx.SaveChangesAsync();
+    }
+    public async Task Delete(TEntity entity)
+    {
+        _ctx.Remove(entity);
+        await _ctx.SaveChangesAsync();
+    }
+
+    public async Task Delete(Expression<Func<TEntity, bool>> predicate)
+    {
+        var entity = await _set.Where(predicate).ToListAsync();
+        if (entity != null)
+        {
+            _ctx.RemoveRange(entity);
+            await _ctx.SaveChangesAsync();
+        }
     }
 }
